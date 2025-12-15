@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Colorful Mobile Recharge App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 via-pink-500 to-orange-400">
+
+<div class="w-full max-w-4xl bg-white/90 backdrop-blur-xl p-8 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)]">
+
+  <h1 class="text-3xl font-extrabold text-center mb-6 bg-gradient-to-r from-blue-600 to-pink-600 bg-clip-text text-transparent">
+    📱 Mobile Recharge Portal
+  </h1>
+
+  <!-- Mobile Number -->
+  <div class="mb-4">
+    <label class="font-semibold">Mobile Number</label>
+    <input id="mobile" type="text" placeholder="Enter 10-digit number"
+      class="w-full mt-1 p-3 rounded-lg border focus:ring-2 focus:ring-pink-400 outline-none">
+  </div>
+
+  <!-- Operator -->
+  <div class="mb-6">
+    <label class="font-semibold">Operator</label>
+    <select id="operator"
+      class="w-full mt-1 p-3 rounded-lg border focus:ring-2 focus:ring-purple-400 outline-none">
+      <option value="">Select Operator</option>
+      <option>Jio</option>
+      <option>Airtel</option>
+      <option>VI</option>
+      <option>BSNL</option>
+    </select>
+  </div>
+
+  <!-- Plans -->
+  <h2 class="text-xl font-bold mb-4">Choose a Plan</h2>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+    <div onclick="selectPlan(199, this)"
+      class="plan bg-gradient-to-r from-blue-500 to-cyan-500 text-white p-5 rounded-2xl cursor-pointer transition transform hover:scale-105">
+      <h3 class="text-xl font-bold">₹199</h3>
+      <p>1.5GB/day</p>
+      <p>28 Days</p>
+    </div>
+
+    <div onclick="selectPlan(299, this)"
+      class="plan bg-gradient-to-r from-green-500 to-emerald-500 text-white p-5 rounded-2xl cursor-pointer transition transform hover:scale-105">
+      <h3 class="text-xl font-bold">₹299</h3>
+      <p>2GB/day</p>
+      <p>28 Days</p>
+    </div>
+
+    <div onclick="selectPlan(499, this)"
+      class="plan bg-gradient-to-r from-orange-500 to-red-500 text-white p-5 rounded-2xl cursor-pointer transition transform hover:scale-105">
+      <h3 class="text-xl font-bold">₹499</h3>
+      <p>2.5GB/day</p>
+      <p>56 Days</p>
+    </div>
+
+  </div>
+
+  <p id="selectedPlan" class="mt-4 font-semibold text-green-600"></p>
+
+  <!-- Button -->
+  <button onclick="doRecharge()"
+    class="mt-6 w-full py-4 rounded-xl text-lg font-bold text-white 
+           bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 transition">
+    
+           Recharge Now
+  </button>
+
+  <!-- Result -->
+  <div id="result" class="mt-5 text-center font-semibold"></div>
+
+</div>
+
+<script>
+let selectedAmount = null;
+let selectedCard = null;
+
+function selectPlan(amount, element) {
+  selectedAmount = amount;
+
+  document.querySelectorAll(".plan").forEach(card => {
+    card.classList.remove("ring-4", "ring-yellow-300");
+  });
+
+  element.classList.add("ring-4", "ring-yellow-300");
+
+  document.getElementById("selectedPlan").innerText =
+    `Selected Plan: ₹${amount}`;
+}
+
+function doRecharge() {
+  const mobile = document.getElementById("mobile").value;
+  const operator = document.getElementById("operator").value;
+  const result = document.getElementById("result");
+
+  if (!/^[0-9]{10}$/.test(mobile)) {
+    result.innerHTML = " Enter valid 10-digit mobile number";
+    result.className = "text-red-600";
+    return;
+  }
+
+  if (!operator) {
+    result.innerHTML = " Please select operator";
+    result.className = "text-red-600";
+    return;
+  }
+
+  if (!selectedAmount) {
+    result.innerHTML = " Please select a recharge plan";
+    result.className = "text-red-600";
+    return;
+  }
+
+  result.innerHTML = "⏳ Processing Recharge...";
+  result.className = "text-blue-600 animate-pulse";
+
+  fetch("https://jsonplaceholder.typicode.com/posts", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      mobile,
+      operator,
+      amount: selectedAmount
+    })
+  })
+  .then(res => res.json())
+  .then(() => {
+    result.innerHTML = " Recharge Successful ";
+    result.className = "text-green-600";
+  })
+  .catch(() => {
+    result.innerHTML = " Recharge Failed";
+    result.className = "text-red-600";
+  });
+}
+</script>
+
+</body>
+</html>
